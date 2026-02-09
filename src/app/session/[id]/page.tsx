@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { mockSessions, Session, TranscriptSegment } from '@/lib/mock-data';
+import { mockSessions, Session } from '@/lib/mock-data';
 import { WaveformTimeline } from '@/components/WaveformTimeline';
 import { EvidencePanel } from '@/components/EvidencePanel';
 import { Button } from '@/components/ui/button';
@@ -16,7 +16,6 @@ import {
   Search, 
   Download, 
   Tag, 
-  MessageSquare,
   Filter,
   CheckCircle2,
   AlertCircle,
@@ -24,7 +23,6 @@ import {
   MoreVertical,
   Volume2
 } from 'lucide-react';
-import { flagComplianceIssues, FlagComplianceIssuesOutput } from '@/ai/flows/flag-compliance-issues';
 import { cn } from '@/lib/utils';
 
 export default function SessionPage() {
@@ -35,7 +33,7 @@ export default function SessionPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFlagIdx, setActiveFlagIdx] = useState<number | null>(null);
-  const [aiFlags, setAiFlags] = useState<FlagComplianceIssuesOutput['flags']>([]);
+  const [aiFlags, setAiFlags] = useState<any[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -51,16 +49,29 @@ export default function SessionPage() {
   const runAudit = async () => {
     if (!session) return;
     setIsAuditing(true);
-    try {
-      const fullTranscript = session.transcript.map(t => `${t.speaker}: ${t.text}`).join('\n');
-      const result = await flagComplianceIssues({ transcript: fullTranscript });
-      setAiFlags(result.flags);
-      if (result.flags.length > 0) setActiveFlagIdx(0);
-    } catch (e) {
-      console.error("Audit failed", e);
-    } finally {
+    
+    // Simulate an audit process since AI flows were removed
+    setTimeout(() => {
+      const mockFlags = [
+        {
+          start: 13,
+          end: 22,
+          type: "Misleading Claim",
+          confidence: 0.95,
+          evidence: "Agent claimed 1.9% rate regardless of credit score."
+        },
+        {
+          start: 29,
+          end: 40,
+          type: "Privacy Violation",
+          confidence: 0.88,
+          evidence: "Agent requested social security number and bank details prematurely."
+        }
+      ];
+      setAiFlags(mockFlags);
+      setActiveFlagIdx(0);
       setIsAuditing(false);
-    }
+    }, 1500);
   };
 
   const togglePlayback = () => {
@@ -150,7 +161,7 @@ export default function SessionPage() {
             </div>
           </div>
 
-          {/* AI Insights Section */}
+          {/* Insights Section */}
           <div className="space-y-4 pt-6 border-t">
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Audit Evidence</h2>
             {aiFlags.length > 0 ? (

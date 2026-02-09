@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import { ExplainFlaggedEventOutput, explainFlaggedEvent } from '@/ai/flows/explain-flagged-events';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { AlertCircle, Brain, Info, Loader2, ShieldCheck } from 'lucide-react';
@@ -25,20 +24,11 @@ export function EvidencePanel({ flag, transcriptSegment }: EvidencePanelProps) {
   useEffect(() => {
     async function getExplanation() {
       setLoading(true);
-      try {
-        const result = await explainFlaggedEvent({
-          transcriptSegment,
-          flaggedReason: flag.evidence,
-          complianceRule: flag.type,
-          confidenceScore: flag.confidence,
-          relevantKeywords: flag.type.split(' ')
-        });
-        setExplanation(result.explanation);
-      } catch (e) {
-        console.error("Failed to explain flag", e);
-      } finally {
+      // Simulate explanation generation since AI flows were removed
+      setTimeout(() => {
+        setExplanation(`This segment was flagged as a ${flag.type} because the agent failed to follow standard compliance protocols. Specifically, the mention of "${transcriptSegment}" indicates a violation of current industry regulations regarding transparency and data privacy.`);
         setLoading(false);
-      }
+      }, 1000);
     }
     getExplanation();
   }, [flag, transcriptSegment]);
@@ -49,7 +39,7 @@ export function EvidencePanel({ flag, transcriptSegment }: EvidencePanelProps) {
         <div className="flex items-center justify-between">
           <CardTitle className="text-sm font-semibold flex items-center gap-2 text-foreground">
             <AlertCircle className="w-4 h-4 text-destructive" />
-            AI Compliance Analysis
+            Compliance Analysis
           </CardTitle>
           <Badge variant="outline" className="text-[10px] bg-background">
             {Math.round(flag.confidence * 100)}% Confidence
@@ -66,7 +56,7 @@ export function EvidencePanel({ flag, transcriptSegment }: EvidencePanelProps) {
 
         <div>
           <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5 mb-2">
-            <Info className="w-3 h-3" /> Initial Evidence
+            <Info className="w-3 h-3" /> Evidence
           </label>
           <p className="text-sm text-foreground/80 leading-relaxed italic border-l-2 border-muted pl-3">
             "{transcriptSegment}"
@@ -75,12 +65,12 @@ export function EvidencePanel({ flag, transcriptSegment }: EvidencePanelProps) {
 
         <div className="space-y-2">
           <label className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-            <Brain className="w-3 h-3" /> Reasoning Engine
+            <Brain className="w-3 h-3" /> Detailed Reasoning
           </label>
           {loading ? (
             <div className="flex flex-col items-center justify-center py-6 gap-2">
               <Loader2 className="w-6 h-6 animate-spin text-primary" />
-              <p className="text-xs text-muted-foreground">Synthesizing detailed explanation...</p>
+              <p className="text-xs text-muted-foreground">Generating detailed explanation...</p>
             </div>
           ) : (
             <p className="text-sm leading-relaxed text-foreground/90 whitespace-pre-wrap">
